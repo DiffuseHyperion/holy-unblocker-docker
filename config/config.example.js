@@ -83,6 +83,19 @@ export const appConfig = {
   //  },
   //},
 
+  // See config options here: https://github.com/apocas/dockerode
+  //docker: {
+  //  socketPath: "/var/run/docker.sock",
+  //},
+
+  // HCAPTCHA CONFIG
+  // HIGHLY RECOMMENDED
+  // https://www.hcaptcha.com/ integration
+  //hcaptcha: {
+  //  siteKey: "10000000-ffff-ffff-ffff-000000000001",
+  //  secret: "0x0000000000000000000000000000000000000000",
+  //},
+
   // DISCORD CONFIG
   // - USES OAUTH2 TO LINK DISCORD ACC TO DASHBOARD
   // - GIVE SUPPORTERS THEIR ROLES IN THE HOLY UB DISCORD

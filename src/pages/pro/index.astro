@@ -6,8 +6,9 @@ import themeStyles from "@styles/ThemeElements.module.scss";
 import InputPassword from "@components/InputPassword.astro";
 import Banner from "@components/Banner.astro";
 import { db } from "@config/apis";
-import { m, createSession } from "@lib/util";
+import { m, createSession, validateCaptcha } from "@lib/util";
 import { verify } from "@lib/hash";
+import InputCaptcha from "@components/InputCaptcha.astro";
 
 const { user, ip } = Astro.locals;
 // redirect to dashboard if they're already signed in
@@ -18,6 +19,7 @@ if (user) return Astro.redirect(to, 302);
 
 let error: string | undefined;
 
+let incorrectCreds = false;
 // is the initial value of the input
 let bademail: string | undefined;
 let badpassword: string | undefined;
@@ -28,6 +30,9 @@ if (Astro.request.method === "POST")
     const email = data.get("email")?.toString() || "";
     const password = data.get("password")?.toString() || "";
     const staySignedIn = data.get("staySignedIn")?.toString() === "on";
+    const captchaToken = data.get("g-recaptcha-response")?.toString();
+
+    error = await validateCaptcha(captchaToken, ip);
 
     if (email === "") {
       error = "Please enter your email.";
@@ -35,7 +40,7 @@ if (Astro.request.method === "POST")
     } else if (password === "") {
       error = "Please enter your password.";
       Astro.response.status = 400;
-    } else {
+    } else if (!error) {
       const user = (
         await db.query<m.UserModel>("SELECT * FROM users WHERE email = $1;", [
           email,
@@ -46,13 +51,13 @@ if (Astro.request.method === "POST")
         const passwordCorrect = await verify(password, user.password_hash);
 
         if (passwordCorrect) {
-          const session = await createSession(ip, user.id);
+          const session = await createSession(ip, user);
           Astro.locals.setSession(session.secret, staySignedIn);
           return Astro.redirect(to, 302);
         }
       }
 
-      error = "Incorrect email or password.";
+      incorrectCreds = true;
       bademail = email;
       badpassword = password;
       Astro.response.status = 401;
@@ -96,6 +101,16 @@ const bai = Astro.url.searchParams.has("bai");
       </div>
       <form class={styles.loginForm} method="post">
         <h1 class={styles.formTitle}>Subscriber Login</h1>
+        {
+          incorrectCreds && (
+            <p class="prettyBanner" data-error>
+              Incorrect email or password.{" "}
+              <u>
+                <a href="/pro/signup">Did you mean to signup?</a>
+              </u>
+            </p>
+          )
+        }
         <Banner
           error={error}
           success={bai ? "thanks for stopping by!" : undefined}
@@ -103,7 +118,7 @@ const bai = Astro.url.searchParams.has("bai");
         <label class={styles.manageField}>
           <div>Email</div>
           <input
-            type="text"
+            type="email"
             name="email"
             class={styles.prettyinput}
             value={bademail}
@@ -114,6 +129,7 @@ const bai = Astro.url.searchParams.has("bai");
           <div>Password</div>
           <InputPassword id="password" name="password" value={badpassword} />
         </label>
+        <InputCaptcha />
         <p>
           <label
             ><input type="checkbox" name="staySignedIn" /> Stay signed in.</label
