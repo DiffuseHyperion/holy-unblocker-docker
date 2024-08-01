@@ -7,28 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  sync-latest-from-upstream:
-    runs-on: ubuntu-latest
-    name: Sync latest commits from upstream repo
-
-    steps:
-    - name: Checkout target repo
-      uses: actions/checkout@v3
-      with:
-        ref:  master
-        persist-credentials: false
-        fetch-depth: 0
-
-    - name: Sync upstream changes
-      id: sync
-      uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
-      with:
-        target_sync_branch: master
-        target_repo_token: ${{ secrets.GH_TOKEN }}
-        upstream_sync_branch: master
-        upstream_sync_repo: holy-unblocker/website2
-        upstream_pull_args: '--allow-unrelated-histories'
-      
   build-docker:
     runs-on: ubuntu-latest
     name: Builds Docker image
