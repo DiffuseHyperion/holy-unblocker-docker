@@ -17,6 +17,7 @@ jobs:
       with:
         ref:  master
         persist-credentials: false
+        fetch-depth: 0
 
     - name: Sync upstream changes
       id: sync
@@ -26,6 +27,7 @@ jobs:
         target_repo_token: ${{ secrets.GH_TOKEN }}
         upstream_sync_branch: master
         upstream_sync_repo: holy-unblocker/website2
+        upstream_pull_args: '--allow-unrelated-histories'
       
   build-docker:
     runs-on: ubuntu-latest
