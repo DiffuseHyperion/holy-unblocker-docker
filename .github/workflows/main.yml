@@ -11,10 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     name: Sync Fork with Remote
     steps:
-      - name: Checkout main
-        uses: actions/checkout@v2
+      - name: Checkout target repo
+        uses: actions/checkout@v4
         with:
-          ref: main
+          ref:  master
+          persist-credentials: false
       - name: Sync-Fork-action
         uses: XueMoMo/Sync-Fork-action@v1.0.6
         with:
