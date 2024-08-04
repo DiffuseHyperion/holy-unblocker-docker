@@ -7,10 +7,26 @@ on:
   workflow_dispatch:
 
 jobs:
+  sync-fork:
+    runs-on: ubuntu-latest
+    name: Sync Fork with Remote
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v2
+        with:
+          ref: main
+      - name: Sync-Fork-action
+        uses: XueMoMo/Sync-Fork-action@v1.0.6
+        with:
+          upstream_repository: https://github.com/holy-unblocker/website2
+          upstream_branch: master
+          target_branch: master
+          # Git config for "pull.rebase" (standard default to false, set to "null" for no config)
+          # git_pull_rebase_config: # optional, default is false
   build-docker:
     runs-on: ubuntu-latest
     name: Builds Docker image
-    needs: sync-latest-from-upstream
+    needs: sync-fork
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
