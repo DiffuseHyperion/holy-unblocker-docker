@@ -19,7 +19,7 @@ jobs:
       - name: Sync-Fork-action
         uses: XueMoMo/Sync-Fork-action@v1.0.6
         with:
-          upstream_repository: https://github.com/holy-unblocker/website2
+          upstream_repository: holy-unblocker/website2
           upstream_branch: master
           target_branch: master
           # Git config for "pull.rebase" (standard default to false, set to "null" for no config)
